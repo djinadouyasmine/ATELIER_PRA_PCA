@@ -88,7 +88,7 @@ def count():
 
     return jsonify(count=n)
 
-# @app.route('/status')
+ @app.route('/status')
 def status():
     return {
         "count": 0,
