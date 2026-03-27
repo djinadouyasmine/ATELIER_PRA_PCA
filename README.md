@@ -231,27 +231,61 @@ Faites preuve de pédagogie et soyez clair dans vos explications et procedures d
 **Exercice 1 :**  
 Quels sont les composants dont la perte entraîne une perte de données ?  
   
-*..Répondez à cet exercice ici..*
+Le composant dont la perte entraîne une perte de données est le PVC pra-data.
+
+En effet, ce volume contient la base de données SQLite. 
+Si ce PVC est supprimé sans sauvegarde, toutes les données sont définitivement perdues.
+
+Les pods, eux, ne stockent pas les données de manière persistante, donc leur suppression n'entraîne pas de perte de données.
 
 **Exercice 2 :**  
 Expliquez nous pourquoi nous n'avons pas perdu les données lors de la supression du PVC pra-data  
   
-*..Répondez à cet exercice ici..*
+Nous n'avons pas perdu les données car des sauvegardes automatiques sont effectuées régulièrement grâce à un CronJob.
+
+Ces sauvegardes sont stockées dans un autre volume persistant appelé PVC pra-backup.
+
+Même si le PVC pra-data est supprimé, les données peuvent être restaurées à partir du PVC pra-backup.
+
+Cela permet de récupérer les données après un sinistre : c’est le principe du PRA (Plan de Reprise d’Activité).
 
 **Exercice 3 :**  
 Quels sont les RTO et RPO de cette solution ?  
   
-*..Répondez à cet exercice ici..*
+Le RTO (Recovery Time Objective) correspond au temps nécessaire pour restaurer le service après un incident.
+
+Dans notre cas, le RTO est de quelques minutes, le temps de relancer l’infrastructure et restaurer la base de données.
+
+Le RPO (Recovery Point Objective) correspond à la quantité de données perdues.
+
+Dans cet atelier, les sauvegardes sont effectuées toutes les minutes, donc le RPO est d’environ 1 minute.
+
+Cela signifie que l’on peut perdre au maximum 1 minute de données.
 
 **Exercice 4 :**  
 Pourquoi cette solution (cet atelier) ne peux pas être utilisé dans un vrai environnement de production ? Que manque-t-il ?   
   
-*..Répondez à cet exercice ici..*
+Cette solution ne peut pas être utilisée en production car elle présente plusieurs limites.
+
+Il n’y a pas de réplication des données (pas de haute disponibilité).
+Il n’y a qu’un seul cluster et un seul point de défaillance.
+La base de données SQLite n’est pas adaptée à un environnement distribué.
+Il n’y a pas de gestion avancée de la sécurité, ni de monitoring.
+
+Pour un environnement de production, il faudrait une architecture plus robuste avec réplication, sauvegardes distantes et supervision.
   
 **Exercice 5 :**  
 Proposez une archtecture plus robuste.   
   
-*..Répondez à cet exercice ici..*
+Une architecture plus robuste pourrait inclure :
+
+- Une base de données distribuée (ex : PostgreSQL avec réplication)
+- Plusieurs nœuds Kubernetes pour éviter un point de défaillance unique
+- Des sauvegardes externalisées (cloud ou stockage distant)
+- Un système de monitoring et d’alerting
+- Un load balancer pour répartir le trafic
+
+Cette architecture permettrait une meilleure disponibilité et une meilleure tolérance aux pannes.
 
 ---------------------------------------------------
 Séquence 6 : Ateliers  
